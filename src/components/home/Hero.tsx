@@ -1,8 +1,21 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { Search, ShoppingCart, TrendingUp, MessageCircle, Star } from "lucide-react";
+import { Search, ShoppingCart, MessageCircle, Star, BadgeCheck, MapPin } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
+import { getListingById } from "@/data/listings";
+
+const spotlightIds = ["l-1001", "l-1002", "l-1003", "l-1005", "l-1011"];
+const spotlight = spotlightIds.map((id) => getListingById(id)!);
+
+const floatConfig = [
+  { className: "left-0 top-2 w-40 sm:w-44", rotate: -4, duration: 6, delay: 0 },
+  { className: "right-0 top-0 w-36 sm:w-40", rotate: 3, duration: 6.5, delay: 0.3 },
+  { className: "left-6 top-44 w-36 sm:w-40", rotate: 2, duration: 7, delay: 0.6 },
+  { className: "right-2 top-48 w-40 sm:w-44", rotate: -3, duration: 6.2, delay: 0.9 },
+  { className: "left-1/2 top-[22rem] w-36 -translate-x-1/2 sm:w-40", rotate: 0, duration: 5.8, delay: 1.2 },
+];
 
 export default function Hero() {
   return (
@@ -15,6 +28,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
+          className="relative z-10"
         >
           <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#FFC107]">
             <ShoppingCart size={14} /> Kuwait & GCC&apos;s Fastest Marketplace
@@ -46,75 +60,94 @@ export default function Hero() {
               </div>
             ))}
           </div>
-        </motion.div>
 
-        {/* Animated marketplace dashboard mockup */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className="relative mx-auto w-full max-w-md lg:max-w-none"
-        >
-          <div className="relative rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/40 backdrop-blur-sm">
-            <div className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#FF7A00] animate-pulse-soft" />
-                <span className="text-sm font-semibold text-white">EMG Dashboard</span>
-              </div>
-              <TrendingUp size={16} className="text-[#FFC107]" />
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {[
-                { label: "Views Today", value: "2,481", color: "#FF7A00" },
-                { label: "New Messages", value: "37", color: "#FFC107" },
-              ].map((stat) => (
-                <div key={stat.label} className="rounded-xl bg-white/5 p-4">
-                  <p className="text-xs text-white/50">{stat.label}</p>
-                  <p className="mt-1 text-xl font-bold text-white">{stat.value}</p>
-                </div>
+          {/* Trusted-by avatar stack */}
+          <div className="mt-8 flex items-center gap-3">
+            <div className="flex -space-x-3">
+              {["s1", "s2", "s3", "s4"].map((seed) => (
+                <Image
+                  key={seed}
+                  src={`https://i.pravatar.cc/80?u=${seed}`}
+                  alt="EMG seller"
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 rounded-full border-2 border-[#1a1a1a] object-cover"
+                />
               ))}
             </div>
-
-            {/* floating product cards */}
-            <div className="relative mt-5 h-56">
-              <motion.div
-                animate={{ y: [0, -14, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute left-0 top-0 w-40 rounded-xl bg-white p-3 shadow-xl"
-              >
-                <div className="h-16 w-full rounded-lg bg-gradient-to-br from-orange-200 to-amber-100" />
-                <p className="mt-2 text-xs font-semibold text-[#1a1a1a]">iPhone 16 Pro Max</p>
-                <p className="text-xs font-bold text-[#FF7A00]">420 KWD</p>
-                <div className="mt-1 flex items-center gap-1 text-[10px] text-amber-500">
-                  <Star size={10} className="fill-amber-400" /> 4.9
-                </div>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, 16, 0] }}
-                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute right-0 top-8 w-40 rounded-xl bg-white p-3 shadow-xl"
-              >
-                <div className="h-16 w-full rounded-lg bg-gradient-to-br from-amber-200 to-yellow-100" />
-                <p className="mt-2 text-xs font-semibold text-[#1a1a1a]">Land Cruiser GXR</p>
-                <p className="text-xs font-bold text-[#FF7A00]">18,500 KWD</p>
-                <div className="mt-1 flex items-center gap-1 text-[10px] text-amber-500">
-                  <Star size={10} className="fill-amber-400" /> 4.7
-                </div>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute bottom-0 left-10 flex items-center gap-2 rounded-full bg-white px-3 py-2 shadow-xl"
-              >
-                <MessageCircle size={14} className="text-[#FF7A00]" />
-                <span className="text-xs font-medium text-[#1a1a1a]">New offer received!</span>
-              </motion.div>
-            </div>
+            <p className="text-sm text-white/55">
+              Trusted by <span className="font-semibold text-white">312,000+</span> buyers & sellers
+            </p>
           </div>
         </motion.div>
+
+        {/* Floating product collage */}
+        <div className="relative mx-auto h-[28rem] w-full max-w-md sm:h-[34rem] lg:max-w-none">
+          {spotlight.map((listing, i) => {
+            const cfg = floatConfig[i];
+            return (
+              <motion.div
+                key={listing.id}
+                initial={{ opacity: 0, y: 30, rotate: 0 }}
+                animate={{ opacity: 1, y: [0, -14, 0], rotate: cfg.rotate }}
+                transition={{
+                  opacity: { duration: 0.5, delay: cfg.delay },
+                  rotate: { duration: 0.5, delay: cfg.delay },
+                  y: { duration: cfg.duration, repeat: Infinity, ease: "easeInOut", delay: cfg.delay },
+                }}
+                className={`absolute ${cfg.className} overflow-hidden rounded-2xl bg-white shadow-2xl shadow-black/40`}
+              >
+                <div className="relative h-24 w-full">
+                  <Image src={listing.image} alt={listing.title} fill className="object-cover" sizes="200px" />
+                  {listing.featured && (
+                    <span className="absolute left-2 top-2 rounded-full bg-gradient-to-r from-[#FF7A00] to-[#FFC107] px-2 py-0.5 text-[9px] font-bold uppercase text-[#1a1a1a]">
+                      Featured
+                    </span>
+                  )}
+                </div>
+                <div className="p-2.5">
+                  <p className="truncate text-xs font-semibold text-[#1a1a1a]">{listing.title}</p>
+                  <div className="mt-1 flex items-center justify-between">
+                    <p className="text-xs font-bold text-[#FF7A00]">
+                      {listing.price === 0 ? "Negotiable" : `${listing.price.toLocaleString()} ${listing.currency}`}
+                    </p>
+                    <span className="flex items-center gap-0.5 text-[10px] text-amber-500">
+                      <Star size={9} className="fill-amber-400" /> {listing.sellerRating}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 flex items-center gap-1 text-[10px] text-black/40">
+                    <MapPin size={9} /> {listing.location}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+
+          {/* Live dashboard chip */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 1.4 }}
+            className="absolute bottom-0 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 shadow-2xl shadow-black/40 backdrop-blur-sm sm:left-0 sm:translate-x-0"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#FF7A00] to-[#FFC107]">
+              <BadgeCheck size={18} className="text-[#1a1a1a]" />
+            </span>
+            <div>
+              <p className="text-xs font-semibold text-white">Verified Sellers Only</p>
+              <p className="text-[11px] text-white/50">Buy & sell with confidence</p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            animate={{ y: [0, -8, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+            className="absolute right-0 bottom-6 z-10 flex items-center gap-2 rounded-full bg-white px-3 py-2 shadow-xl sm:right-2"
+          >
+            <MessageCircle size={14} className="text-[#FF7A00]" />
+            <span className="text-xs font-medium text-[#1a1a1a]">New offer received!</span>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
