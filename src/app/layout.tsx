@@ -48,9 +48,6 @@ export const metadata: Metadata = {
     title: "EMG | Everything Must Go Online",
     description: "Buy, sell, advertise, and grow your business online.",
   },
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({
