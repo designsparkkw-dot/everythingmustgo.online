@@ -7,6 +7,8 @@ import { blogPosts } from "@/data/content";
 
 const baseUrl = "https://everythingmustgo.online";
 
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     "",
