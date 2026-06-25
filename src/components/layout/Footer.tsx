@@ -86,7 +86,7 @@ export default function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-8 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-5">
-            <span className="flex items-center gap-2"><Mail size={14} /> support@everythingmustgo.online</span>
+            <span className="flex items-center gap-2"><Mail size={14} /> info@everythingmustgo.online</span>
             <span className="flex items-center gap-2"><Phone size={14} /> +965 5000 1000</span>
             <span className="flex items-center gap-2"><MapPin size={14} /> Kuwait City, Kuwait</span>
           </div>

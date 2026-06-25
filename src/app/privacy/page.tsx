@@ -25,7 +25,7 @@ const sections = [
   },
   {
     title: "5. Your Rights",
-    body: "You may access, update, or request deletion of your personal data at any time from your account settings or by contacting support@everythingmustgo.online.",
+    body: "You may access, update, or request deletion of your personal data at any time from your account settings or by contacting info@everythingmustgo.online.",
   },
   {
     title: "6. Cookies",

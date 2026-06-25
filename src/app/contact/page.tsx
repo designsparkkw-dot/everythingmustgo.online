@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 const channels = [
-  { icon: Mail, label: "Email", value: "support@everythingmustgo.online" },
+  { icon: Mail, label: "Email", value: "info@everythingmustgo.online" },
   { icon: Phone, label: "Phone", value: "+965 5000 1000" },
   { icon: MapPin, label: "Office", value: "Kuwait City, Kuwait" },
   { icon: MessageCircle, label: "WhatsApp", value: "+965 5000 1000" },

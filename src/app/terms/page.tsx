@@ -45,7 +45,7 @@ const sections = [
   },
   {
     title: "10. Contact",
-    body: "Questions about these Terms can be directed to support@everythingmustgo.online.",
+    body: "Questions about these Terms can be directed to info@everythingmustgo.online.",
   },
 ];
 
