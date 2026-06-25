@@ -42,7 +42,6 @@ const icons: Record<string, typeof Smartphone> = {
 const navLinks = [
   { label: "Marketplace", href: "/marketplace" },
   { label: "Business Directory", href: "/business" },
-  { label: "Pricing", href: "/pricing" },
   { label: "Blog", href: "/blog" },
 ];
 

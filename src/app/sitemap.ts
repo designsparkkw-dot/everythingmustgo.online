@@ -13,7 +13,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/marketplace",
     "/categories",
     "/business",
-    "/pricing",
     "/blog",
     "/about",
     "/contact",

@@ -44,50 +44,19 @@ export const howItWorksSteps = [
 ];
 
 export const whyChooseFeatures = [
-  { title: "Free Listings", description: "Post your first listings at zero cost, always.", icon: "Gift" },
-  { title: "Premium Promotions", description: "Boost visibility with featured placement & sponsored ads.", icon: "Sparkles" },
+  { title: "Free Listings", description: "Post unlimited listings at zero cost, always.", icon: "Gift" },
+  { title: "Verified Sellers", description: "Trade with confidence through verified seller profiles.", icon: "Sparkles" },
   { title: "Secure Messaging", description: "Buyer-seller chat with built-in safety guidelines.", icon: "ShieldCheck" },
   { title: "Fast Search", description: "Find exactly what you need with advanced filters.", icon: "Zap" },
   { title: "Mobile Friendly", description: "A seamless experience on any device, anywhere.", icon: "Smartphone" },
   { title: "Business Advertising", description: "Dedicated tools to grow your brand across the GCC.", icon: "TrendingUp" },
 ];
 
-export const pricingPlans = [
-  {
-    name: "Starter",
-    price: 0,
-    period: "forever",
-    description: "For individuals getting started with selling.",
-    features: ["5 active listings", "Standard search placement", "Basic messaging", "Community support"],
-    cta: "Get Started",
-    highlighted: false,
-  },
-  {
-    name: "Professional",
-    price: 19,
-    period: "month",
-    description: "For active sellers & growing businesses.",
-    features: ["50 active listings", "5 featured listings/month", "Priority search placement", "Seller analytics dashboard", "Priority support"],
-    cta: "Upgrade Now",
-    highlighted: true,
-  },
-  {
-    name: "Enterprise",
-    price: 79,
-    period: "month",
-    description: "For businesses & agencies at scale.",
-    features: ["Unlimited listings", "25 featured listings/month", "Dedicated business profile page", "Homepage banner placements", "API access", "Dedicated account manager"],
-    cta: "Contact Sales",
-    highlighted: false,
-  },
-];
-
 export const faqs = [
-  { question: "Is it free to post a listing on EMG?", answer: "Yes, every EMG account can post free listings. Upgrading to Professional or Enterprise unlocks featured placement and higher listing limits." },
+  { question: "Is it free to post a listing on EMG?", answer: "Yes, posting on EMG is completely free for everyone." },
   { question: "How do I contact a seller?", answer: "Use EMG's secure in-app messaging or tap the WhatsApp button on any listing to chat directly with the seller." },
   { question: "Which countries does EMG operate in?", answer: "EMG launched in Kuwait and is expanding across the GCC, including Saudi Arabia, UAE, Qatar, Bahrain and Oman." },
   { question: "How does EMG verify sellers?", answer: "Business sellers go through a verification process including phone, civil ID, and trade license checks where applicable." },
-  { question: "What payment methods are supported for premium plans?", answer: "We support KNET, Visa, Mastercard and Apple Pay for all subscription and promotion purchases." },
   { question: "Can I edit or remove a listing after posting?", answer: "Yes, manage all your listings anytime from your Seller Dashboard, including editing details, pausing or deleting." },
 ];
 

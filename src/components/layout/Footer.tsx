@@ -10,7 +10,6 @@ const columns = [
     links: [
       { label: "Browse Listings", href: "/marketplace" },
       { label: "Business Directory", href: "/business" },
-      { label: "Pricing Plans", href: "/pricing" },
       { label: "Start Selling", href: "/sell" },
     ],
   },

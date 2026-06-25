@@ -84,7 +84,7 @@ export default function SellPage() {
             Publish Listing
           </Button>
           <p className="text-center text-xs text-black/40">
-            Your first 5 listings are free. Upgrade anytime for featured placement.
+            Posting on EMG is completely free.
           </p>
         </form>
       </div>
