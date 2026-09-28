@@ -1,6 +1,7 @@
 import Hero from "@/components/home/Hero";
 import CategoriesSection from "@/components/home/CategoriesSection";
 import FeaturedListings from "@/components/home/FeaturedListings";
+import CommunityListings from "@/components/home/CommunityListings";
 import HowItWorks from "@/components/home/HowItWorks";
 import WhyChoose from "@/components/home/WhyChoose";
 import StatsCounter from "@/components/home/StatsCounter";
@@ -13,6 +14,7 @@ export default function Home() {
       <Hero />
       <CategoriesSection />
       <FeaturedListings />
+      <CommunityListings />
       <HowItWorks />
       <WhyChoose />
       <StatsCounter />

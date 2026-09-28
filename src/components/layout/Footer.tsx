@@ -27,6 +27,7 @@ const columns = [
     links: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms & Conditions", href: "/terms" },
+      { label: "Prohibited Items", href: "/prohibited-items" },
     ],
   },
 ];

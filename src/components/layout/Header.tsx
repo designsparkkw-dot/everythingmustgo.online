@@ -23,8 +23,9 @@ import {
   User,
 } from "lucide-react";
 import Logo from "@/components/ui/Logo";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { categories } from "@/data/categories";
+import { useAuth } from "@/lib/AuthContext";
 
 const icons: Record<string, typeof Smartphone> = {
   Smartphone,
@@ -49,6 +50,7 @@ export default function Header() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -123,9 +125,28 @@ export default function Header() {
             <Link href="/marketplace" aria-label="Search" className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-[#1a1a1a] hover:border-[#FF7A00] hover:text-[#FF7A00] transition-colors">
               <Search size={18} />
             </Link>
-            <ButtonLink href="/contact" variant="outline" size="sm">
-              <User size={16} /> Log In
-            </ButtonLink>
+            {user ? (
+              <>
+                {isAdmin && (
+                  <ButtonLink href="/admin" variant="outline" size="sm">
+                    Admin
+                  </ButtonLink>
+                )}
+                <ButtonLink href="/my-listings" variant="outline" size="sm">
+                  <User size={16} /> My Listings
+                </ButtonLink>
+                <ButtonLink href="/profile" variant="ghost" size="sm">
+                  Profile
+                </ButtonLink>
+                <Button variant="outline" size="sm" onClick={() => signOut()}>
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <ButtonLink href="/login" variant="outline" size="sm">
+                <User size={16} /> Log In
+              </ButtonLink>
+            )}
             <ButtonLink href="/sell" variant="primary" size="sm">
               Start Selling
             </ButtonLink>
@@ -168,12 +189,18 @@ export default function Header() {
                   </div>
 
                   <div className="mb-6 flex gap-2">
-                    <ButtonLink href="/sell" variant="primary" size="sm" className="flex-1">
+                    <ButtonLink href="/sell" variant="primary" size="sm" className="flex-1" onClick={() => setMobileOpen(false)}>
                       Start Selling
                     </ButtonLink>
-                    <ButtonLink href="/contact" variant="outline" size="sm" className="flex-1">
-                      Log In
-                    </ButtonLink>
+                    {user ? (
+                      <ButtonLink href="/profile" variant="outline" size="sm" className="flex-1" onClick={() => setMobileOpen(false)}>
+                        Profile
+                      </ButtonLink>
+                    ) : (
+                      <ButtonLink href="/login" variant="outline" size="sm" className="flex-1" onClick={() => setMobileOpen(false)}>
+                        Log In
+                      </ButtonLink>
+                    )}
                   </div>
 
                   <p className="mb-2 text-xs font-bold uppercase tracking-wider text-black/40">Categories</p>

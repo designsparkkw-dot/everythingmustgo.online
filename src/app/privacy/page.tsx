@@ -13,15 +13,15 @@ const sections = [
   },
   {
     title: "2. How We Use Your Information",
-    body: "We use your information to operate and improve the marketplace, facilitate buyer-seller communication, process subscription payments, prevent fraud, and send relevant notifications.",
+    body: "We use your information to operate and improve the marketplace, facilitate buyer-seller communication, moderate content, prevent fraud, and send relevant notifications.",
   },
   {
     title: "3. Sharing of Information",
-    body: "We do not sell your personal data. Information may be shared with payment processors (KNET, Visa, Mastercard, Apple Pay), service providers (such as Cloudinary for media storage), and law enforcement where legally required.",
+    body: "We do not sell your personal data. Information may be shared with our infrastructure provider (Supabase, which hosts our database, authentication, and file storage) and with law enforcement where legally required. Your WhatsApp number and phone number, when you choose to add them to your profile, are visible on any listing you post so buyers can contact you directly.",
   },
   {
     title: "4. Data Security",
-    body: "EMG uses industry-standard security practices, including encrypted authentication (JWT) and secure storage, to protect your data against unauthorized access.",
+    body: "EMG uses industry-standard security practices, including encrypted authentication, row-level security on our database, and secure file storage, to protect your data against unauthorized access.",
   },
   {
     title: "5. Your Rights",

@@ -24,12 +24,12 @@ const sections = [
     body: "EMG is a platform connecting buyers and sellers. We are not a party to any transaction between users and do not guarantee the quality, safety, or legality of items advertised.",
   },
   {
-    title: "5. Subscriptions & Payments",
-    body: "Premium plans (Starter, Professional, Enterprise) and promotional features are billed via KNET, Visa, Mastercard, or Apple Pay. Subscriptions renew automatically unless cancelled before the renewal date.",
+    title: "5. Free to Use",
+    body: "Posting listings on EMG is free. We do not currently charge for standard listings and there are no subscription fees. If paid features are introduced in the future, they will be clearly labelled and require separate consent.",
   },
   {
-    title: "6. Prohibited Conduct",
-    body: "Users may not post illegal items, engage in fraud, harass other users, scrape data, or attempt to circumvent platform fees through off-platform arrangements initiated via EMG.",
+    title: "6. Prohibited Conduct & Items",
+    body: "Users may not post illegal, counterfeit, stolen, or restricted items, engage in fraud, harass other users, or scrape platform data. See our Prohibited Items policy for the full list. Violations result in listing removal and possible account termination.",
   },
   {
     title: "7. Termination",
