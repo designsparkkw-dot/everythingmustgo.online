@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/ui/PageHero";
 import MarketplaceGrid from "@/components/marketplace/MarketplaceGrid";
-import CommunityListings from "@/components/home/CommunityListings";
 
 export const metadata: Metadata = {
   title: "Marketplace - Buy & Sell Anything Online",
@@ -16,7 +15,6 @@ export default function MarketplacePage() {
         title="Browse All Listings"
         description="Search, filter, and discover thousands of listings from verified sellers across Kuwait and the GCC."
       />
-      <CommunityListings />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <MarketplaceGrid />
       </div>

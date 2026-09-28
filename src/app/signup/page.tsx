@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import PageHero from "@/components/ui/PageHero";
 import { Button } from "@/components/ui/Button";
 import { getSupabase, supabaseConfigured } from "@/lib/supabase";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -46,6 +47,13 @@ export default function SignupPage() {
               Auth not configured. Add Supabase env vars to enable sign-up.
             </div>
           )}
+
+          <GoogleSignInButton />
+
+          <div className="flex items-center gap-3 text-xs text-black/40">
+            <span className="h-px flex-1 bg-black/10" /> or sign up with email <span className="h-px flex-1 bg-black/10" />
+          </div>
+
           <div>
             <label className="mb-1.5 block text-sm font-semibold">Full name</label>
             <input type="text" required value={name} onChange={(e) => setName(e.target.value)}
