@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, ExternalLink, Flag, Loader2, RefreshCw, ShieldAlert, Trash2, XCircle } from "lucide-react";
 import PageHero from "@/components/ui/PageHero";
+import AdminNav from "@/components/admin/AdminNav";
 import { useAuth } from "@/lib/AuthContext";
 import { getSupabase } from "@/lib/supabase";
 
@@ -121,8 +122,8 @@ export default function AdminReportsPage() {
     <>
       <PageHero eyebrow="Admin" title="Reports queue" description="Review user-flagged listings for scams, abuse, and prohibited items." />
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+        <AdminNav />
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <Link href="/admin" className="mr-2 text-sm font-semibold text-black/50 hover:text-[#FF7A00]">← Listings</Link>
           {(Object.keys(FILTER_LABELS) as Filter[]).map((f) => {
             const active = filter === f;
             return (

@@ -1,135 +1,83 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
-  Check,
-  Clock,
+  AlertTriangle,
+  CheckCircle2,
   ExternalLink,
+  Flag,
   Loader2,
-  RefreshCw,
+  Plus,
   ShieldAlert,
   ShoppingBag,
-  Trash2,
-  XCircle,
+  Users,
 } from "lucide-react";
 import PageHero from "@/components/ui/PageHero";
+import AdminNav from "@/components/admin/AdminNav";
 import { useAuth } from "@/lib/AuthContext";
 import { getSupabase, type ListingRow } from "@/lib/supabase";
 
-type Filter = "pending" | "active" | "rejected" | "sold" | "all";
-
-type ListingWithSeller = ListingRow & {
-  seller_name: string | null;
+type Stats = {
+  users: number;
+  pending: number;
+  active: number;
+  sold: number;
+  rejected: number;
+  openReports: number;
+  whatsappCoverage: number;
 };
 
-const FILTER_LABELS: Record<Filter, string> = {
-  pending: "Pending review",
-  active: "Approved",
-  rejected: "Rejected",
-  sold: "Sold",
-  all: "All",
+type RecentReport = {
+  id: string;
+  listing_id: string;
+  reason: string;
+  created_at: string;
 };
 
-const STATUS_PILL: Record<ListingRow["status"], string> = {
-  pending: "bg-amber-100 text-amber-800",
-  active: "bg-emerald-100 text-emerald-800",
-  sold: "bg-slate-200 text-slate-700",
-  rejected: "bg-red-100 text-red-800",
-};
-
-export default function AdminPage() {
-  const { user, loading: authLoading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [filter, setFilter] = useState<Filter>("pending");
-  const [rows, setRows] = useState<ListingWithSeller[]>([]);
-  const [counts, setCounts] = useState<Record<Filter, number>>({
-    pending: 0, active: 0, rejected: 0, sold: 0, all: 0,
-  });
+export default function AdminOverviewPage() {
+  const { user, loading: authLoading, isAdmin } = useAuth();
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [recentPending, setRecentPending] = useState<ListingRow[]>([]);
+  const [recentReports, setRecentReports] = useState<RecentReport[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // Check admin flag
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) { setIsAdmin(false); return; }
-    const supabase = getSupabase();
-    if (!supabase) { setIsAdmin(false); return; }
-    (async () => {
-      const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-      setIsAdmin(data?.role === "admin");
-    })();
-  }, [user, authLoading]);
-
-  const loadCounts = useCallback(async () => {
-    const supabase = getSupabase();
-    if (!supabase) return;
-    const statuses: ListingRow["status"][] = ["pending", "active", "rejected", "sold"];
-    const results = await Promise.all(
-      statuses.map((s) =>
-        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", s)
-      )
-    );
-    const c: Record<Filter, number> = { pending: 0, active: 0, rejected: 0, sold: 0, all: 0 };
-    statuses.forEach((s, i) => { c[s] = results[i].count ?? 0; c.all += results[i].count ?? 0; });
-    setCounts(c);
-  }, []);
 
   const load = useCallback(async () => {
-    const supabase = getSupabase();
-    if (!supabase) return;
-    setLoading(true); setError(null);
-    let q = supabase.from("listings").select("*").order("created_at", { ascending: false }).limit(100);
-    if (filter !== "all") q = q.eq("status", filter);
-    const { data, error: e } = await q;
-    if (e) {
-      setError(e.message); setRows([]); setLoading(false); return;
-    }
-    const listings = (data as ListingRow[]) ?? [];
-    const userIds = Array.from(new Set(listings.map((l) => l.user_id)));
-    const names = new Map<string, string | null>();
-    if (userIds.length > 0) {
-      const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", userIds);
-      (profs ?? []).forEach((p) => names.set(p.id, p.full_name));
-    }
-    setRows(listings.map((l) => ({ ...l, seller_name: names.get(l.user_id) ?? null })));
+    const supabase = getSupabase(); if (!supabase) return;
+    setLoading(true);
+
+    const [pendingRes, activeRes, soldRes, rejectedRes, usersRes, waRes, reportsOpenRes, pendingListRes, reportsListRes] =
+      await Promise.all([
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "sold"),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("status", "rejected"),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).not("whatsapp", "is", null),
+        supabase.from("listing_reports").select("id", { count: "exact", head: true }).eq("status", "open"),
+        supabase.from("listings").select("*").eq("status", "pending").order("created_at", { ascending: false }).limit(5),
+        supabase.from("listing_reports").select("id, listing_id, reason, created_at").eq("status", "open").order("created_at", { ascending: false }).limit(5),
+      ]);
+
+    const users = usersRes.count ?? 0;
+    setStats({
+      users,
+      pending: pendingRes.count ?? 0,
+      active: activeRes.count ?? 0,
+      sold: soldRes.count ?? 0,
+      rejected: rejectedRes.count ?? 0,
+      openReports: reportsOpenRes.count ?? 0,
+      whatsappCoverage: users > 0 ? Math.round(((waRes.count ?? 0) / users) * 100) : 0,
+    });
+    setRecentPending((pendingListRes.data as ListingRow[]) ?? []);
+    setRecentReports((reportsListRes.data as RecentReport[]) ?? []);
     setLoading(false);
-  }, [filter]);
+  }, []);
 
-  useEffect(() => {
-    if (isAdmin) { load(); loadCounts(); }
-  }, [isAdmin, load, loadCounts]);
+  useEffect(() => { if (isAdmin) load(); }, [isAdmin, load]);
 
-  const setStatus = async (id: string, status: ListingRow["status"]) => {
-    const supabase = getSupabase(); if (!supabase) return;
-    setBusyId(id);
-    const { error: e } = await supabase.from("listings").update({ status, updated_at: new Date().toISOString() }).eq("id", id);
-    setBusyId(null);
-    if (e) { alert(e.message); return; }
-    setRows((r) => filter === "all" ? r.map((x) => x.id === id ? { ...x, status } : x) : r.filter((x) => x.id !== id));
-    loadCounts();
-  };
-
-  const remove = async (id: string) => {
-    if (!confirm("Permanently delete this listing and all its images? This cannot be undone.")) return;
-    const supabase = getSupabase(); if (!supabase) return;
-    setBusyId(id);
-    const { error: e } = await supabase.from("listings").delete().eq("id", id);
-    setBusyId(null);
-    if (e) { alert(e.message); return; }
-    setRows((r) => r.filter((x) => x.id !== id));
-    loadCounts();
-  };
-
-  // Gate rendering
-  if (authLoading || isAdmin === null) {
-    return (
-      <div className="flex justify-center py-32 text-black/45"><Loader2 className="animate-spin" /></div>
-    );
-  }
-
+  if (authLoading) return <div className="flex justify-center py-32 text-black/45"><Loader2 className="animate-spin" /></div>;
   if (!user) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
@@ -140,191 +88,120 @@ export default function AdminPage() {
       </div>
     );
   }
-
   if (!isAdmin) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <ShieldAlert size={40} className="mx-auto mb-4 text-red-500" />
         <h1 className="mb-2 text-2xl font-bold">Not authorized</h1>
-        <p className="text-sm text-black/60">
-          Your account doesn&apos;t have admin privileges. Ask an owner to promote you via the
-          Supabase dashboard.
-        </p>
+        <p className="text-sm text-black/60">Your account doesn&apos;t have admin privileges.</p>
       </div>
     );
   }
 
   return (
     <>
-      <PageHero
-        eyebrow="Admin"
-        title="Moderation queue"
-        description="Approve, reject, or remove listings before they go live."
-      />
+      <PageHero eyebrow="Admin" title="Dashboard" description="Everything happening on EMG at a glance." />
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-4 flex gap-2">
-          <Link href="/admin" className="rounded-full bg-[#1a1a1a] px-4 py-1.5 text-sm font-semibold text-white">Listings</Link>
-          <Link href="/admin/reports" className="rounded-full border border-black/10 bg-white px-4 py-1.5 text-sm font-semibold hover:border-[#FF7A00]">Reports</Link>
-        </div>
+        <AdminNav />
 
-        {/* Stats + filter tabs */}
-        <div className="mb-6 flex flex-wrap items-center gap-2">
-          {(Object.keys(FILTER_LABELS) as Filter[]).map((f) => {
-            const active = filter === f;
-            return (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors ${
-                  active
-                    ? "border-[#FF7A00] bg-[#FF7A00] text-white"
-                    : "border-black/10 bg-white text-[#1a1a1a] hover:border-[#FF7A00]/60"
-                }`}
-              >
-                {FILTER_LABELS[f]}
-                <span className={`rounded-full px-1.5 text-xs ${active ? "bg-white/25" : "bg-black/5"}`}>
-                  {counts[f]}
-                </span>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => { load(); loadCounts(); }}
-            className="ml-auto inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold hover:border-[#FF7A00]"
-            title="Refresh"
-          >
-            <RefreshCw size={12} /> Refresh
-          </button>
-        </div>
-
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
-        )}
-
-        {loading ? (
+        {loading || !stats ? (
           <div className="flex justify-center py-16 text-black/45"><Loader2 className="animate-spin" /></div>
-        ) : rows.length === 0 ? (
-          <div className="rounded-2xl border border-black/5 bg-white p-10 text-center">
-            <ShoppingBag size={32} className="mx-auto mb-3 text-black/25" />
-            <p className="text-sm text-black/60">Nothing in this queue right now.</p>
-          </div>
         ) : (
-          <div className="space-y-3">
-            {rows.map((r) => (
-              <AdminRow
-                key={r.id}
-                row={r}
-                busy={busyId === r.id}
-                onApprove={() => setStatus(r.id, "active")}
-                onReject={() => setStatus(r.id, "rejected")}
-                onSold={() => setStatus(r.id, "sold")}
-                onReopen={() => setStatus(r.id, "pending")}
-                onDelete={() => remove(r.id)}
-              />
-            ))}
-          </div>
+          <>
+            {/* Stat cards */}
+            <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+              <StatCard label="Total users" value={stats.users} Icon={Users} accent="text-[#1a1a1a]" />
+              <StatCard label="Active listings" value={stats.active} Icon={CheckCircle2} accent="text-emerald-600" />
+              <StatCard label="Pending review" value={stats.pending} Icon={ShoppingBag} accent="text-amber-600" highlight={stats.pending > 0} />
+              <StatCard label="Open reports" value={stats.openReports} Icon={Flag} accent="text-red-600" highlight={stats.openReports > 0} />
+              <StatCard label="Sold" value={stats.sold} Icon={CheckCircle2} accent="text-slate-500" />
+              <StatCard label="Rejected" value={stats.rejected} Icon={AlertTriangle} accent="text-red-500" />
+              <StatCard label="WhatsApp coverage" value={`${stats.whatsappCoverage}%`} Icon={Users} accent="text-[#25D366]" />
+              <div className="col-span-2 flex flex-col justify-center gap-2 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 p-4 md:col-span-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#FF7A00]">Quick action</p>
+                <Link href="/admin/new-listing" className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#FF7A00] to-[#FFC107] px-4 py-2 text-sm font-semibold text-[#1a1a1a]">
+                  <Plus size={14} /> Post a listing
+                </Link>
+              </div>
+            </div>
+
+            {/* Two columns: pending + reports */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <PanelCard title="Recent pending listings" href="/admin/listings" cta="Open queue" empty="No pending listings right now.">
+                {recentPending.map((r) => (
+                  <div key={r.id} className="flex items-center gap-3 border-b border-black/5 py-2.5 last:border-b-0">
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-[#FAFAFA]">
+                      {r.cover_image_url && <Image src={r.cover_image_url} alt="" fill sizes="48px" className="object-cover" unoptimized />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate text-sm font-semibold text-[#1a1a1a]">{r.title}</p>
+                      <p className="text-xs text-black/50">{r.price_kwd.toFixed(3)} KWD · {r.category_slug}</p>
+                    </div>
+                    <Link href={`/l?id=${r.id}`} target="_blank" className="rounded-full bg-black/5 p-1.5 text-black/50 hover:bg-black/10">
+                      <ExternalLink size={12} />
+                    </Link>
+                  </div>
+                ))}
+              </PanelCard>
+
+              <PanelCard title="Recent open reports" href="/admin/reports" cta="Open reports" empty="No open reports.">
+                {recentReports.map((r) => (
+                  <div key={r.id} className="flex items-center justify-between gap-3 border-b border-black/5 py-2.5 last:border-b-0">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-red-700">{r.reason.replace(/_/g, " ")}</p>
+                      <p className="text-xs text-black/45">{new Date(r.created_at).toLocaleString()}</p>
+                    </div>
+                    <Link href={`/l?id=${r.listing_id}`} target="_blank" className="rounded-full bg-black/5 p-1.5 text-black/50 hover:bg-black/10">
+                      <ExternalLink size={12} />
+                    </Link>
+                  </div>
+                ))}
+              </PanelCard>
+            </div>
+          </>
         )}
       </div>
     </>
   );
 }
 
-function AdminRow({
-  row, busy, onApprove, onReject, onSold, onReopen, onDelete,
+function StatCard({
+  label, value, Icon, accent, highlight,
 }: {
-  row: ListingWithSeller;
-  busy: boolean;
-  onApprove: () => void;
-  onReject: () => void;
-  onSold: () => void;
-  onReopen: () => void;
-  onDelete: () => void;
+  label: string;
+  value: number | string;
+  Icon: React.ComponentType<{ size?: number }>;
+  accent: string;
+  highlight?: boolean;
 }) {
-  const created = useMemo(() => new Date(row.created_at).toLocaleString(), [row.created_at]);
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-black/5 bg-white p-4 sm:flex-row">
-      <div className="relative h-32 w-full shrink-0 overflow-hidden rounded-xl bg-[#FAFAFA] sm:h-24 sm:w-32">
-        {row.cover_image_url ? (
-          <Image src={row.cover_image_url} alt={row.title} fill sizes="128px" className="object-cover" unoptimized />
-        ) : (
-          <div className="flex h-full items-center justify-center text-xs text-black/30">No photo</div>
-        )}
+    <div className={`rounded-2xl border p-4 ${highlight ? "border-amber-300 bg-amber-50" : "border-black/5 bg-white"}`}>
+      <div className={`mb-1 flex items-center gap-1.5 ${accent}`}>
+        <Icon size={14} />
+        <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
       </div>
+      <p className="text-2xl font-bold text-[#1a1a1a]">{value}</p>
+    </div>
+  );
+}
 
-      <div className="flex flex-1 flex-col gap-2">
-        <div className="flex flex-wrap items-start gap-2">
-          <h3 className="mr-2 font-semibold text-[#1a1a1a]">{row.title}</h3>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${STATUS_PILL[row.status]}`}>
-            {row.status}
-          </span>
-          <Link
-            href={`/l?id=${row.id}`}
-            target="_blank"
-            className="inline-flex items-center gap-1 rounded-full bg-black/5 px-2 py-0.5 text-[10px] font-semibold text-black/60 hover:bg-black/10"
-          >
-            Preview <ExternalLink size={10} />
-          </Link>
-        </div>
-
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-black/60">
-          <span className="font-semibold text-[#FF7A00]">{row.price_kwd.toFixed(3)} KWD</span>
-          <span>{row.category_slug}</span>
-          {row.location && <span>{row.location}</span>}
-          <span>Seller: {row.seller_name || "—"}</span>
-          <span className="flex items-center gap-1"><Clock size={11} />{created}</span>
-        </div>
-
-        {row.description && (
-          <p className="line-clamp-2 text-sm text-black/70">{row.description}</p>
-        )}
-
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          {row.status !== "active" && (
-            <button
-              onClick={onApprove}
-              disabled={busy}
-              className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
-            >
-              <Check size={12} /> Approve
-            </button>
-          )}
-          {row.status !== "rejected" && (
-            <button
-              onClick={onReject}
-              disabled={busy}
-              className="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
-            >
-              <XCircle size={12} /> Reject
-            </button>
-          )}
-          {row.status === "active" && (
-            <button
-              onClick={onSold}
-              disabled={busy}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
-            >
-              Mark sold
-            </button>
-          )}
-          {(row.status === "rejected" || row.status === "sold") && (
-            <button
-              onClick={onReopen}
-              disabled={busy}
-              className="inline-flex items-center gap-1 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-semibold hover:border-[#FF7A00]"
-            >
-              Move to pending
-            </button>
-          )}
-          <button
-            onClick={onDelete}
-            disabled={busy}
-            className="ml-auto inline-flex items-center gap-1 rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-50"
-          >
-            <Trash2 size={12} /> Delete
-          </button>
-          {busy && <Loader2 size={14} className="animate-spin text-black/40" />}
-        </div>
+function PanelCard({
+  title, href, cta, empty, children,
+}: {
+  title: string; href: string; cta: string; empty: string; children: React.ReactNode;
+}) {
+  const isEmpty = Array.isArray(children) ? children.length === 0 : !children;
+  return (
+    <div className="rounded-2xl border border-black/5 bg-white p-5">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-bold text-[#1a1a1a]">{title}</h3>
+        <Link href={href} className="text-xs font-semibold text-[#FF7A00] hover:underline">{cta} →</Link>
       </div>
+      {isEmpty ? (
+        <p className="py-6 text-center text-xs text-black/40">{empty}</p>
+      ) : (
+        <div>{children}</div>
+      )}
     </div>
   );
 }
